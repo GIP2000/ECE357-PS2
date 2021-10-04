@@ -48,12 +48,12 @@ bool isLink(mode_t mode){
 
 // takes a fileName and determines if it is a . or .. directory
 bool isRef(char* fileName,int size){
-    return(fileName[size-3] == '.' && ((fileName[size-4] == '.' && fileName[size-5] == '/') || fileName[size-6] == '/'));
+    return(fileName[size-2] == '.' && ((fileName[size-3] == '.' && fileName[size-4] == '/') || fileName[size-3] == '/'));
 }
 
 // returns false if the file is the parent
 bool isNotParent(char* fileName, int size){
-    return (!(fileName[size-3] == '.' && fileName[size-4] == '.' && fileName[size-5] == '/')); 
+    return (!(fileName[size-2] == '.' && fileName[size-3] == '.' && fileName[size-4] == '/')); 
 }
 
 // takes in the mode of a file and prints out the correct drwx format
@@ -110,9 +110,10 @@ void myReadDir(char* fileName, bool isTop){
         if(errnoC != errno) handleError(errno,"Error while reading file",fileName); 
         errnoC = errno; 
         struct stat statbuf;
-        const unsigned int size = strlen(fileName) + strlen(dp->d_name)+2; 
-        char * fullName = malloc(size*sizeof(char));
-        strcpy(fullName,fileName);strcat(fullName,dp->d_name);
+        const unsigned int size = strlen(fileName) + strlen(dp->d_name)+1; 
+        char fullName[size];
+        memset(fullName,0,size*sizeof(char));
+        strcat(fullName,fileName);strcat(fullName,dp->d_name);
         if(lstat(fullName, &statbuf) == -1) handleError(errno,"Error getting statistics on",fileName); 
         else if(!isRef(fullName,size) || (isTop && !isNotParent(fullName,size))){
             stringPrinter(dp,statbuf,(isTop && !isNotParent(fullName,size)) ? fileName:fullName);
@@ -121,7 +122,7 @@ void myReadDir(char* fileName, bool isTop){
                 myReadDir(fullName,false); 
             }
         }
-        free(fullName); 
+        // free(fullName); 
     }
 }
 
