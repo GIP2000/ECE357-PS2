@@ -72,14 +72,7 @@ void printMode(mode_t mode){
         buf[5] = (mode & S_IXGRP) ? 's' : 'l';
     if (mode & S_ISVTX)
         buf[8] = (mode & S_IXOTH) ? 't' : 'T';
-    
     printf("%s",buf); 
-    
-
-
-    // printf("%s",rwxp[(int)((mode&0700) >> 6)]);
-    // printf("%s",rwxp[(int)((mode&0070) >> 3)]);
-    // printf("%s",rwxp[(int)(mode&0007)]);
 }
 
 // Takes in directory information and prints it out formatted correctly 
