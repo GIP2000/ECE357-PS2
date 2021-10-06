@@ -61,9 +61,25 @@ void printMode(mode_t mode){
     if(isDirectory(mode)) printf("d");
     else if(isSomething(mode)) printf("-");
     else printf("?");
-    printf("%s",rwxp[(int)((mode&0700) >> 6)]);
-    printf("%s",rwxp[(int)((mode&0070) >> 3)]);
-    printf("%s",rwxp[(int)(mode&0007)]);
+    char buf[10]; 
+    strcpy(&buf[0],rwxp[(int)((mode&0700) >> 6)]);
+    strcpy(&buf[3],rwxp[(int)((mode&0070) >> 3)]); 
+    strcpy(&buf[6],rwxp[(int)(mode&0007)]); 
+    buf[9] = '\0';
+    if (mode & S_ISUID)
+        buf[2] = (mode & S_IXUSR) ? 's' : 'S';
+    if (mode & S_ISGID)
+        buf[5] = (mode & S_IXGRP) ? 's' : 'l';
+    if (mode & S_ISVTX)
+        buf[8] = (mode & S_IXOTH) ? 't' : 'T';
+    
+    printf("%s",buf); 
+    
+
+
+    // printf("%s",rwxp[(int)((mode&0700) >> 6)]);
+    // printf("%s",rwxp[(int)((mode&0070) >> 3)]);
+    // printf("%s",rwxp[(int)(mode&0007)]);
 }
 
 // Takes in directory information and prints it out formatted correctly 
@@ -122,7 +138,6 @@ void myReadDir(char* fileName, bool isTop){
                 myReadDir(fullName,false); 
             }
         }
-        // free(fullName); 
     }
 }
 
