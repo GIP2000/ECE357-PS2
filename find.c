@@ -59,6 +59,7 @@ bool isNotParent(char* fileName, int size){
 // takes in the mode of a file and prints out the correct drwx format
 void printMode(mode_t mode){
     if(isDirectory(mode)) printf("d");
+    else if(isLink(mode)) printf("l"); 
     else if(isSomething(mode)) printf("-");
     else printf("?");
     char buf[10]; 
@@ -124,9 +125,9 @@ void myReadDir(char* fileName, bool isTop){
         memset(fullName,0,size*sizeof(char));
         strcat(fullName,fileName);strcat(fullName,dp->d_name);
         if(lstat(fullName, &statbuf) == -1) handleError(errno,"Error getting statistics on",fileName); 
-        else if(!isRef(fullName,size) || (isTop && !isNotParent(fullName,size))){
-            stringPrinter(dp,statbuf,(isTop && !isNotParent(fullName,size)) ? fileName:fullName);
-            if(isDirectory(statbuf.st_mode) && !(isTop && !isNotParent(fullName,size))) {
+        else if(!isRef(fullName,size) || (isTop && isNotParent(fullName,size))){
+            stringPrinter(dp,statbuf,(isTop && isNotParent(fullName,size) && isRef(fullName,size)) ? fileName:fullName);
+            if(isDirectory(statbuf.st_mode) && !(isTop && isNotParent(fullName,size) && isRef(fullName,size))) {
                 strcat(fullName,"/"); 
                 myReadDir(fullName,false); 
             }
